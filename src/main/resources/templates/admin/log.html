@@ -1,0 +1,89 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>日志管理</title>
+    <link rel="stylesheet" href="../../static/assets/libs/layui/css/layui.css"/>
+    <link rel="stylesheet" href="../../static/assets/module/admin.css?v=315"/>
+
+</head>
+<body>
+
+<!-- 页面加载loading -->
+<div class="page-loading">
+    <div class="ball-loader">
+        <span></span><span></span><span></span><span></span>
+    </div>
+</div>
+
+<!-- 正文开始 -->
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-card-body table-tool-mini">
+            <br/>
+            <h3 class="text-center" style="font-weight: bold;color: red">日志管理</h3>
+            <input tb-search="tableUser" style="width: 300px!important;" name="fromEmail,getName,getAccount"
+                   class="layui-input icon-search" type="text"/>
+            <table class="layui-table" id="tableUser" lay-filter="tableUser"></table>
+        </div>
+    </div>
+</div>
+
+
+<!-- 表格状态列 -->
+<script type="text/html" id="tableStateUser">
+    <input type="checkbox" lay-filter="ckStateUser" value="{{d.id}}" lay-skin="switch"
+           lay-text="赠送|购买" {{d.type==1?'checked':''}} disabled/>
+</script>
+
+<!-- js部分 -->
+<script type="text/javascript" src="../../static/assets/libs/layui/layui.js"></script>
+<script type="text/javascript" src="../../static/assets/js/common.js?v=315"></script>
+<script>
+    layui.use(['layer', 'form', 'table', 'util', 'admin', 'tableX', 'notice'], function () {
+        var $ = layui.jquery;
+        var layer = layui.layer;
+        var form = layui.form;
+        var table = layui.table;
+        var util = layui.util;
+        var admin = layui.admin;
+        var tableX = layui.tableX;
+        var notice = layui.notice;
+
+        // 渲染表格
+        var insTb = tableX.renderFront({
+            elem: '#tableUser',
+            url: '/getLog',
+            method: 'post',
+            page: {groups: 6},
+            limit: 30,
+            limits: [15, 30, 50, 100],
+            toolbar: true,
+            cellMinWidth: 100,
+            cols: [
+                [
+                    {field: 'id', hide: true, sort: true, title: 'id'},
+                    {field: 'fromMail', width: 200, sort: true, title: '购买者邮箱', align: 'center'},
+                    {field: 'fromId',hide: true,  width: 200, sort: true, title: '购买者iD', align: 'center'},
+                    {field: 'fromName', width: 200, sort: true, title: '购买者', align: 'center'},
+                    {field: 'getId',hide: true,  width: 200, sort: true, title: '接收者ID', align: 'center'},
+                    {field: 'getName', width: 200, sort: true, title: '接收者', align: 'center'},
+                    {field: 'getAccount', width: 200, sort: true, title: '接收者账号', align: 'center'},
+                    {field: 'itemId', width: 200, sort: true, title: '购买ID', align: 'center'},
+                    {field: 'itemName', width: 200, sort: true, title: '购买名称', align: 'center'},
+                    {field: 'itemCount', width: 200, sort: true, title: '购买数量', align: 'center'},
+                    {field: 'itemPrice', width: 200, sort: true, title: '购买价格', align: 'center'},
+                    {field: 'giftTime', width: 200, sort: true, title: '购买时间', align: 'center'},
+                    {field: 'type', sort: true, templet: '#tableStateUser', title: '类型', align: 'center'},
+
+                ]
+            ]
+        });
+
+    });
+</script>
+
+</body>
+</html>

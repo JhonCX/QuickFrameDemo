@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh_CN" xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>服务端管理</title>
+    <link rel="stylesheet" href="../../static/assets/libs/layui/css/layui.css"/>
+    <link rel="stylesheet" href="../../static/assets/module/admin.css?v=315"/>
+    <style>
+        .dash {
+            border-bottom: 1px dashed #ccc;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+
+<!-- 加载动画 -->
+<div class="page-loading">
+    <div class="ball-loader">
+        <span></span><span></span><span></span><span></span>
+    </div>
+</div>
+
+
+<!-- 正文开始 -->
+<div class="layui-fluid">
+    <div class="layui-form" style="padding-bottom:  70px;" id="serverForm" lay-filter="serverForm">
+        <div class="layui-row layui-col-space15">
+            <div class="layui-col-md6">
+                <div class="layui-card">
+                    <div class="layui-card-header">登录设置</div>
+                    <div class="layui-card-body">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">登录设置</label>
+                            <div class="layui-input-block">
+                                <input type="radio" name="loginFlag" value="1" title="允许" checked>
+                                <input type="radio" name="loginFlag" value="0" title="禁止">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-md6">
+                <div class="layui-card">
+                    <div class="layui-card-header">注册开关</div>
+                    <div class="layui-card-body">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">开启注册</label>
+                            <div class="layui-input-block">
+                                <input type="radio" name="registerFlag" value="1" title="开启" checked>
+                                <input type="radio" name="registerFlag" value="0" title="关闭">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-md6">
+                <div class="layui-card">
+                    <div class="layui-card-header">商城公告</div>
+                    <div class="layui-card-body">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">编写公告</label>
+                            <div class="layui-input-block">
+                                <input class="layui-input" placeholder="请输入公告"  type="text" name="message"
+                                       lay-verType="tips" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center"
+                 style="position: fixed;bottom: 0;left: 0;right: 0;background-color: #fff;box-shadow: 0 -1px 5px rgba(0,0,0,.15);padding: 15px;">
+                <button class="layui-btn" lay-filter="submitDemo" lay-submit>更改配置</button>
+            </div>
+        </div>
+    </div>
+</div>
+    <!-- 表格操作列 -->
+    <script type="text/html" id="tableBarTbTree">
+        <a class="layui-btn layui-btn layui-btn-xs" lay-event="del">删除大标题</a>
+    </script>
+    <!-- js部分 -->
+    <script type="text/javascript" src="../../static/assets/libs/layui/layui.js"></script>
+    <script type="text/javascript" src="../../static/assets/js/common.js?v=315"></script>
+    <script>
+        layui.use(['layer', 'element', 'table', 'tableX', 'admin', 'form', 'notice', 'formX'], function () {
+            var $ = layui.jquery;
+            var form = layui.form;
+            var formX = layui.formX;
+            var notice = layui.notice;
+            var admin = layui.admin;
+
+            // 监听表单提交
+            form.on('submit(submitDemo)', function (data) {
+                console.log(data);
+                $.post('/updateServer', {
+                    loginFlag: data.field.loginFlag,
+                    registerFlag:data.field.registerFlag,
+                    message: data.field.message
+                }, function (res) {
+                    layer.closeAll('loading');
+                    if (res.code === SUCCESS_CODE) {
+                        noticeSuccess(res.msg);
+                    } else {
+                        noticeError(res.msg);
+                        $.post('/getServerSet', {}, function (res) {
+                            layer.closeAll('loading');
+                            if (res.code === SUCCESS_CODE) {
+                                form.val('serverForm', res.data);
+                            } else {
+                                layer.msg(res.msg, {icon: 2});
+                            }
+                        }, 'json');
+
+                        layer.msg(res.msg, {icon: 2});
+                    }
+                }, 'json');
+                return false;
+            });
+
+
+
+            $.post('/getServerSet', {}, function (res) {
+                layer.closeAll('loading');
+                if (res.code === SUCCESS_CODE) {
+                    form.val('serverForm', res.data);
+                } else {
+                    layer.msg(res.msg, {icon: 2});
+                }
+            }, 'json');
+
+
+        });
+    </script>
+</body>
+</html>

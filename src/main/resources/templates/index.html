@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh_CN" xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href="../static/assets/images/favicon.ico" rel="icon">
+    <title>QuickFrame</title>
+    <link rel="stylesheet" href="../static/assets/libs/layui/css/layui.css"/>
+    <link rel="stylesheet" href="../static/assets/module/admin.css?v=315"/>
+</head>
+<style>
+    .tuozhuai {
+        -webkit-app-region: drag;
+        -webkit-user-select: none;
+    }
+
+    .butuozhuai {
+        -webkit-app-region: no-drag;
+    }
+</style>
+<body class="layui-layout-body">
+<div class="layui-layout layui-layout-admin">
+    <!-- 头部 -->
+    <div class="layui-header tuozhuai">
+        <div class="layui-logo butuozhuai">
+            <img src="../static/assets/images/logo.png"/>
+            <cite>&nbsp;QuickFrame</cite>
+        </div>
+        <ul class="layui-nav layui-layout-left butuozhuai">
+            <li class="layui-nav-item" lay-unselect>
+                <a ew-event="flexible" title="侧边伸缩"><i class="layui-icon layui-icon-shrink-right"></i></a>
+            </li>
+            <li class="layui-nav-item" lay-unselect>
+                <a ew-event="refresh" title="刷新"><i class="layui-icon layui-icon-refresh-3"></i></a>
+            </li>
+        </ul>
+        <ul class="layui-nav layui-layout-right butuozhuai">
+            <li class="layui-nav-item" lay-unselect>
+                <a ew-event="note" data-url="../static/page/tpl/tpl-note.html" title="便签"><i
+                        class="layui-icon layui-icon-note"></i></a>
+            </li>
+            <li class="layui-nav-item layui-hide-xs" lay-unselect>
+                <a ew-event="fullScreen" title="全屏"><i class="layui-icon layui-icon-screen-full"></i></a>
+            </li>
+            <li class="layui-nav-item" lay-unselect>
+                <a>
+                    <img src="../static/assets/images/logo.png" class="layui-nav-img">
+                    <cite id="nowUser">用户</cite>
+                </a>
+                <dl class="layui-nav-child">
+                    <dd lay-unselect>
+                        <a ew-href="/userInfo">个人中心</a>
+                    </dd>
+                    <dd lay-unselect>
+                        <a ew-event="psw" data-url="../static/page/tpl/tpl-password.html">修改密码</a>
+                    </dd>
+                    <hr>
+                    <dd lay-unselect>
+                        <a ew-event="logout" data-url="/logout">注销</a>
+                    </dd>
+                    <dd lay-unselect>
+                        <a href="javascript:window.opener=null;window.open('','_self');window.close();">关闭</a>
+                    </dd>
+
+                </dl>
+            </li>
+            <li class="layui-nav-item" lay-unselect>
+                <a ew-event="theme" title="主题" data-url="../static/page/tpl/tpl-theme.html"><i
+                        class="layui-icon layui-icon-more-vertical"></i></a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- 侧边栏 -->
+    <div class="layui-side">
+        <div class="layui-side-scroll">
+            <ul class="layui-nav layui-nav-tree arrow2" lay-filter="admin-side-nav" lay-accordion="true"
+                style="margin-top: 15px;">
+                <shiro:hasRole name="ROLE_USER">
+                <li class="layui-nav-item">
+                    <a lay-href="/welcome"><i
+                            class="layui-icon layui-icon-home"></i>&emsp;<cite>首页</cite></a>
+                </li>
+                </shiro:hasRole>
+                <shiro:hasRole name="ROLE_ADMIN">
+                    <li class="layui-nav-item">
+                        <a><i class="layui-icon layui-icon-user"></i>&emsp;<cite>用户管理</cite></a>
+                        <dl class="layui-nav-child">
+                            <dd><a lay-href="/toUserManage">用户管理</a></dd>
+                        </dl>
+                    </li>
+                </shiro:hasRole>
+                <shiro:hasRole name="ROLE_ADMIN">
+                    <li class="layui-nav-item">
+                        <a lay-href="/toServer"><i
+                                class="layui-icon layui-icon-set"></i>&emsp;<cite>系统管理</cite></a>
+                    </li>
+                </shiro:hasRole>
+                </shiro:hasRole>
+                <shiro:hasRole name="ROLE_ADMIN">
+                    <li class="layui-nav-item">
+                        <a lay-href="/toLog"><i
+                                class="layui-icon layui-icon-set"></i>&emsp;<cite>登录日志</cite></a>
+                    </li>
+                </shiro:hasRole>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 主体部分 -->
+    <div class="layui-body"></div>
+    <!-- 底部 -->
+    <div class="layui-footer">
+        <a href="https://wzmoe.com" target="_blank">By Cc.仅限个人娱乐使用</a>
+        <span class="pull-right">Version 0.1</span>
+    </div>
+</div>
+
+<!-- 加载动画 -->
+<div class="page-loading">
+    <div class="ball-loader">
+        <span></span><span></span><span></span><span></span>
+    </div>
+</div>
+
+<!-- js部分 -->
+<script type="text/javascript" src="../static/assets/libs/layui/layui.js"></script>
+<script type="text/javascript" src="../static/assets/js/common.js?v=315"></script>
+<script th:inline="javascript">
+    layui.use(['index', 'admin', 'layer', 'notice'], function () {
+        var $ = layui.jquery;
+        var index = layui.index;
+        var admin = layui.admin;
+        var layer = layui.layer;
+        var notice = layui.notice;
+
+        // $('.layui-body>.layui-tab[lay-filter="admin-pagetabs"]').attr('lay-autoRefresh', 'false');
+
+        // 默认加载主页
+        index.loadHome({
+            menuPath: '/welcome',
+            menuName: '<i class="layui-icon layui-icon-home"></i>'
+        });
+
+
+        $.get("/getNowUser", function (res) {
+            $('#nowUser').html(res.data);
+        });
+
+
+
+        var websocket = null;
+        if ('WebSocket' in window) {
+            websocket = new WebSocket('ws://' + window.location.host + '/webSocket');
+            websocket.onopen = function (event) {
+                admin.req('/getNotice', {}, function (res) {
+
+                }, 'post');
+                console.log('建立连接');
+            };
+
+            websocket.onclose = function (event) {
+                notice.success({
+                    title: 'GM公告',
+                    position: 'topRight', //位置 bottomRight、bottomLeft、topRight、 topLeft、 topCenter、 bottomCenter 、 center。
+                    transitionIn: 'fadeIn', //入场动画 bounceInLeft, bounceInRight, bounceInUp, bounceInDown, fadeIn, fadeInDown, fadeInUp, fadeInLeft, fadeInRight , flipInX。
+                    transitionOut: 'fadeOut', //出场动画 fadeOut, fadeOutUp, fadeOutDown, fadeOutLeft, fadeOutRight, flipOutX。
+                    timeout: '5000', //显示时间
+                    progressBar: 'true',//进度条
+                    balloon: 'true',//气泡效果
+                    close: 'true',//关闭效果
+                    animateInside: 'true', //	文字动画效果
+                    theme: 'light',//主题 light、dark
+                    audio: '3',//音效	 1，2，3，4，5，6
+                    pauseOnHover: 'false',//鼠标滑过暂停消失时间
+                    resetOnHover: 'true',//鼠标滑过重置消失时间
+                    message: "与服务器断开连接，请尝试刷新！",
+                });
+                console.log('连接关闭');
+            };
+
+            websocket.onmessage = function (event) {
+                console.log('收到消息:' + event.data);
+                // //弹窗提醒, 播放音乐
+                // $('#dingdanxiaoxi').modal('show');
+                //
+                // document.getElementById('notice').play();
+                notice.success({
+                    title: 'GM公告',
+                    position: 'topRight', //位置 bottomRight、bottomLeft、topRight、 topLeft、 topCenter、 bottomCenter 、 center。
+                    transitionIn: 'fadeIn', //入场动画 bounceInLeft, bounceInRight, bounceInUp, bounceInDown, fadeIn, fadeInDown, fadeInUp, fadeInLeft, fadeInRight , flipInX。
+                    transitionOut: 'fadeOut', //出场动画 fadeOut, fadeOutUp, fadeOutDown, fadeOutLeft, fadeOutRight, flipOutX。
+                    timeout: '5000', //显示时间
+                    progressBar: 'true',//进度条
+                    balloon: 'true',//气泡效果
+                    close: 'true',//关闭效果
+                    animateInside: 'true', //	文字动画效果
+                    theme: 'light',//主题 light、dark
+                    audio: '3',//音效	 1，2，3，4，5，6
+                    pauseOnHover: 'false',//鼠标滑过暂停消失时间
+                    resetOnHover: 'true',//鼠标滑过重置消失时间
+                    message: event.data,
+                });
+            };
+
+            websocket.onerror = function () {
+                alert('websocket通信发生错误！');
+            };
+
+            window.onbeforeunload = function () {
+                websocket.close();
+            };
+        } else {
+            alert('该浏览器不支持消息通知!');
+        }
+
+    });
+</script>
+
+</body>
+</html>
